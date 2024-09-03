@@ -25,11 +25,10 @@ jobs:
                 format: 'sarif'
                 output: 'trivy-results.sarif'
                 severity: 'CRITICAL'
-            
-            - name: Connecting to JFrog
-              uses: jfrog/setup-jfrog-cli@v4
+
+            - name: Upload Trivy scan results to JFrog
+              run: curl -u ${JF_USER}:${JF_PASSWORD} -X POST ${JF_URL} -F "file=@trivy-results.sarif"
               env:
                 JF_URL: ${{ secrets.JF_URL }}
                 JF_USER: ${{ secrets.JF_USER }}
                 JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
-            - run: jf rt ping
