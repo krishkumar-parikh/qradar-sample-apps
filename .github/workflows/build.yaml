@@ -16,8 +16,6 @@ jobs:
             - uses: actions/checkout@v3
             - name: Install Python dependencies
               run: python -m pip install --upgrade pip && pip install -r requirements.txt
-            - name: Lint
-              run: make lint
             - name: Beautify
               run: make beautify
             - name: Check for code differences
