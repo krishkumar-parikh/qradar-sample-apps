@@ -27,7 +27,7 @@ jobs:
                 severity: 'CRITICAL'
 
             - name: Upload Trivy scan results to JFrog
-              run: curl -u ${JF_PASSWORD} -X PUT ${JF_URL}/trivy-results.sarif -F "file=@trivy-results.sarif"
+              run: curl -H ${JF_PASSWORD} -X PUT ${JF_URL}/trivy-results.sarif -F "file=@trivy-results.sarif"
               env:
                 JF_URL: ${{ secrets.JF_URL }}
                 JF_USER: ${{ secrets.JF_USER }}
