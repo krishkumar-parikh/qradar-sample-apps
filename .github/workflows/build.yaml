@@ -32,10 +32,4 @@ jobs:
                 JF_URL: ${{ secrets.JF_URL }}
                 JF_USER: ${{ secrets.JF_USER }}
                 JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
-
-            - name: Upload Trivy scan results to JFrog
-              run: curl -u ${JF_USER}:${JF_PASSWORD} -X PUT ${JF_URL}/trivy-results.sarif -T trivy-results.sarif
-              env:
-                JF_URL: ${{ secrets.JF_URL }}
-                JF_USER: ${{ secrets.JF_USER }}
-                JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
+            - run: jf rt ping
