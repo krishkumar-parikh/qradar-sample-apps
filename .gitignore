@@ -4,3 +4,4 @@
 node_modules/
 .qradar_app_uuid
 log/
+.venv

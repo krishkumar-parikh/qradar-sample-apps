@@ -1,14 +1,25 @@
 name: build
 on:
-    push:
-    pull_request:
-    workflow_dispatch:
+  push:
+  pull_request:
+  workflow_dispatch:
         
 jobs:
     build:
         name: Build
         runs-on: self-hosted
         steps:
+            - uses: actions/setup-python@v4
+              with:
+                  python-version: '3.7.2'
+            - name: Install Python dependencies
+              run: python -m pip install --upgrade pip && pip install -r requirements.txt
+
+            - name: Beautify code
+              run: | 
+                make beautify
+                git diff --exit-code
+
             - name: Run Trivy vulnerability scanner in repo mode
               uses: aquasecurity/trivy-action@0.20.0
               with:
@@ -18,9 +29,8 @@ jobs:
                 output: 'trivy-results.sarif'
                 severity: 'CRITICAL'
 
-            - name: Upload Trivy scan results to JFrog
-              run: curl -H "X-JFrog-Art-Api:${JF_PASSWORD}" -X PUT ${JF_URL}/trivy-results.sarif -F "file=@trivy-results.sarif" 
+            - name: Upload Trivy scan results to Artifactory
+              run: curl -H "X-JFrog-Art-Api:${ARTIFACTORY_API_KEY}" -X PUT ${ENDPOINT_URL}/trivy-results.sarif -F "file=@trivy-results.sarif"
               env:
-                JF_URL: ${{ secrets.JF_URL }}
-                JF_USER: ${{ secrets.JF_USER }}
-                JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
+                JF_URL: ${{ secrets.ENDPOINT_URL }}
+                JF_PASSWORD: ${{ secrets.ARTIFACTORY_API_KEY }}
