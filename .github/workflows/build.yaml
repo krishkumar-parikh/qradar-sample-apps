@@ -5,32 +5,57 @@ on:
   workflow_dispatch:
         
 jobs:
-    build:
+    setup-python:
         name: Build
-        runs-on: self-hosted
+        runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v3
+              with:
+                    fetch-depth: 0
             - uses: actions/setup-python@v4
               with:
                   python-version: '3.7.2'
             - name: Install Python dependencies
               run: python -m pip install --upgrade pip && pip install -r requirements.txt
 
-            - name: Beautify code
-              run: | 
-                make beautify
-                git diff --exit-code
+    beatify:
+        name: Beautify
+        runs-on: ubuntu-latest
+        steps:
+          - name: Beautify code
+            run: | 
+              make beautify
+              git diff --exit-code
+      
+    trivy:
+      name: Trivy Repo Scan
+      needs: setup-python
+      runs-on: self-hosted
+      steps:
+        - name: Run Trivy vulnerability scanner in repo mode
+          uses: aquasecurity/trivy-action@0.20.0
+          with:
+            scan-type: 'fs'
+            ignore-unfixed: true
+            format: 'sarif'
+            output: 'trivy-results.sarif'
+            severity: 'CRITICAL'
 
-            - name: Run Trivy vulnerability scanner in repo mode
-              uses: aquasecurity/trivy-action@0.20.0
+        - name: Upload Trivy scan results to Artifactory
+          run: curl -H "X-JFrog-Art-Api:${ARTIFACTORY_API_KEY}" -X PUT ${ENDPOINT_URL}/trivy-results.sarif -F "file=@trivy-results.sarif"
+          env:
+            JF_URL: ${{ secrets.ENDPOINT_URL }}
+            JF_PASSWORD: ${{ secrets.ARTIFACTORY_API_KEY }}
+
+    sonar:
+        name: SonarCloud
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
               with:
-                scan-type: 'fs'
-                ignore-unfixed: true
-                format: 'sarif'
-                output: 'trivy-results.sarif'
-                severity: 'CRITICAL'
-
-            - name: Upload Trivy scan results to Artifactory
-              run: curl -H "X-JFrog-Art-Api:${ARTIFACTORY_API_KEY}" -X PUT ${ENDPOINT_URL}/trivy-results.sarif -F "file=@trivy-results.sarif"
+                  fetch-depth: 0
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
               env:
-                JF_URL: ${{ secrets.ENDPOINT_URL }}
-                JF_PASSWORD: ${{ secrets.ARTIFACTORY_API_KEY }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
