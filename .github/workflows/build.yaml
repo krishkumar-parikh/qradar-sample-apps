@@ -7,7 +7,7 @@ on:
 jobs:
     setup-python:
       name: Setup Python and Install Dependencies
-      runs-on: self-hosted
+      runs-on: ubuntu-20.04
       steps:
           - uses: actions/checkout@v3
             with:
@@ -23,7 +23,7 @@ jobs:
     beatify:
       name: Beautify
       needs: setup-python
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v3
           with:
@@ -34,7 +34,7 @@ jobs:
     lint:
       name: Lint
       needs: setup-python
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v3
           with:
@@ -63,7 +63,7 @@ jobs:
 
     sonar:
       name: SonarCloud
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-20.04
       steps:
           - uses: actions/checkout@v3
             with:
