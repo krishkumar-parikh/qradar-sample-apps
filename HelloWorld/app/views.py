@@ -20,6 +20,5 @@ viewsbp = Blueprint('viewsbp', __name__, url_prefix='/')
 
 @viewsbp.route('/')
 @viewsbp.route('/index')
-
 def index():
     return "Hello World!"
