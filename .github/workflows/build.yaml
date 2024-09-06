@@ -27,24 +27,24 @@ jobs:
           - name: Diff Check
             run: git diff --exit-code
       
-    # trivy:
-    #   name: Trivy Repo Scan
-    #   runs-on: self-hosted
-    #   steps:
-    #     - name: Run Trivy vulnerability scanner in repo mode
-    #       uses: aquasecurity/trivy-action@0.20.0
-    #       with:
-    #         scan-type: 'fs'
-    #         ignore-unfixed: true
-    #         format: 'sarif'
-    #         output: 'trivy-results.sarif'
-    #         severity: 'CRITICAL'
+    trivy:
+      name: Trivy Repo Scan
+      runs-on: self-hosted
+      steps:
+        - name: Run Trivy vulnerability scanner in repo mode
+          uses: aquasecurity/trivy-action@0.20.0
+          with:
+            scan-type: 'fs'
+            ignore-unfixed: true
+            format: 'sarif'
+            output: 'trivy-results.sarif'
+            severity: 'CRITICAL'
 
-    #     - name: Upload Trivy scan results to Artifactory
-    #       run: curl -H "X-JFrog-Art-Api:${ARTIFACTORY_API_KEY}" -X PUT ${ENDPOINT_URL}/trivy-results.sarif -F "file=@trivy-results.sarif"
-    #       env:
-    #         ENDPOINT_URL: ${{ secrets.ENDPOINT_URL }}
-    #         ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
+        - name: Upload Trivy scan results to Artifactory
+          run: curl -H "X-JFrog-Art-Api:${ARTIFACTORY_API_KEY}" -X PUT ${ENDPOINT_URL}/trivy-results.sarif -F "file=@trivy-results.sarif"
+          env:
+            ENDPOINT_URL: ${{ secrets.ENDPOINT_URL }}
+            ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
 
     sonar:
       name: SonarCloud
